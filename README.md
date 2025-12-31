@@ -60,8 +60,6 @@ llm-sql-analyst-agent/
 │   ├── schema.py       # Schema extraction
 │   ├── safety.py       # SQL guardrails
 │   └── prompt.py       # LLM instructions
-├── notebooks/
-│   └── 01_sqlite_smoke_test.ipynb
 ├── README.md
 └── requirements.txt
 ```
