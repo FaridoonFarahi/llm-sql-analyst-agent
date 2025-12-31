@@ -1,0 +1,4 @@
+pandas>=2.0
+openai>=1.0
+certifi
+pip-system-certs
