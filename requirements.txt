@@ -1,4 +1,11 @@
-pandas>=2.0
-openai>=1.0
+# Direct dependencies only — pip resolves transitives.
+pandas>=2.0,<3
+openai>=1.0,<3
+python-dotenv>=1.0,<2
+sqlparse>=0.4,<1
+
+# TLS cert handling. certifi is bundled in openai's deps, but pinning it here
+# guarantees it's available. pip-system-certs is Windows-only and optional;
+# uncomment if you hit corporate-proxy SSL errors on Windows.
 certifi
-pip-system-certs
+# pip-system-certs ; sys_platform == "win32"

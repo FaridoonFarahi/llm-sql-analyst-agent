@@ -1,17 +1,19 @@
 import sqlite3
 import pandas as pd
-from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parents[1] / "db" / "chinook.db"
+from config import DB_PATH
+
 
 def get_schema() -> pd.DataFrame:
     """
-    Returns table + column info for every table in the database.
+    Return one row per (table, column) for every table in the database.
+    Used to ground the LLM in the real schema.
     """
-    with sqlite3.connect(DB_PATH) as conn:
+    uri = f"file:{DB_PATH}?mode=ro"
+    with sqlite3.connect(uri, uri=True) as conn:
         tables = pd.read_sql_query(
             "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;",
-            conn
+            conn,
         )
 
         rows = []
@@ -21,7 +23,7 @@ def get_schema() -> pd.DataFrame:
                 rows.append({
                     "table": t,
                     "column": r["name"],
-                    "type": r["type"]
+                    "type": r["type"],
                 })
 
         return pd.DataFrame(rows)

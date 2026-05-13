@@ -50,16 +50,18 @@ This project showcases:
 ```text
 llm-sql-analyst-agent/
 ├── assets/
-│   ├── demo_revenue.png
 │   └── demo_customers.png
 ├── db/
 │   └── chinook.db
 ├── src/
-│   ├── agent.py        # LLM → SQL → execute
-│   ├── db.py           # SQL execution
+│   ├── agent.py        # LLM → SQL → execute (entry point)
+│   ├── db.py           # SQL execution (opens DB read-only)
 │   ├── schema.py       # Schema extraction
-│   ├── safety.py       # SQL guardrails
-│   └── prompt.py       # LLM instructions
+│   ├── safety.py       # SQL guardrails (sqlparse-based)
+│   ├── prompt.py       # LLM instructions
+│   └── config.py       # Paths, model, key validation
+├── .env.example
+├── .gitignore
 ├── README.md
 └── requirements.txt
 ```
@@ -73,9 +75,48 @@ llm-sql-analyst-agent/
 
 ---
 
+## 🛠 Setup
+
+```bash
+# 1. Clone and enter the repo
+git clone https://github.com/FaridoonFarahi/llm-sql-analyst-agent.git
+cd llm-sql-analyst-agent
+
+# 2. Create a virtualenv
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
+
+# 3. Install deps
+pip install -r requirements.txt
+
+# 4. Configure your OpenAI key
+cp .env.example .env        # then edit .env and paste your key
+```
+
+> The `.env` file is gitignored — never commit your API key.
+
+---
+
 ## ▶️ How to Run
 ```bash
 python src/agent.py
 ```
+
+You'll be prompted for a natural-language question. The agent prints
+the generated SQL and the top rows of the result.
+
+---
+
+## 🛡 Safety model
+
+- **LLM never executes SQL directly.** It only emits a SQL string.
+- That string is parsed by `sqlparse`. The agent **rejects** anything
+  that isn't a single `SELECT` (or `WITH … SELECT`).
+- The SQLite connection is opened in **read-only mode**
+  (`?mode=ro`) so even if the safety check were bypassed,
+  the database file cannot be modified.
 
 ---

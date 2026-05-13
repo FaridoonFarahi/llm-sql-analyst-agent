@@ -1,13 +1,17 @@
 import sqlite3
 import pandas as pd
-from pathlib import Path
 
-DB_PATH = Path(__file__).resolve().parents[1] / "db" / "chinook.db"
+from config import DB_PATH
+
 
 def run_sql(query: str) -> pd.DataFrame:
     """
-    Runs a SQL query against the local Chinook SQLite database
-    and returns a pandas DataFrame.
+    Run a single SQL query against the local Chinook SQLite database
+    and return the result as a pandas DataFrame.
+
+    Opens the DB in read-only mode (URI 'mode=ro') as defense-in-depth
+    on top of the safety check in safety.py.
     """
-    with sqlite3.connect(DB_PATH) as conn:
+    uri = f"file:{DB_PATH}?mode=ro"
+    with sqlite3.connect(uri, uri=True) as conn:
         return pd.read_sql_query(query, conn)
