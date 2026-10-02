@@ -1,7 +1,7 @@
 """
 SQL safety check.
 
-Uses sqlparse to identify statement types reliably. Allows exactly one
+Uses sqlparse to identify statement types. Allows exactly one
 read-only statement (SELECT or WITH ... SELECT). Falls back to a regex
 check if sqlparse is unavailable.
 """

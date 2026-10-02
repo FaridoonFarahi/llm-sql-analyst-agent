@@ -1,8 +1,8 @@
 """
 LLM SQL analyst agent.
 
-Pipeline: natural-language question → LLM-generated SELECT →
-safety check → execute → DataFrame.
+Pipeline: a natural-language question goes to the LLM, which writes a
+SELECT. The query passes a safety check, runs, and comes back as a DataFrame.
 """
 from __future__ import annotations
 
@@ -32,24 +32,24 @@ def _client() -> OpenAI:
 
 @lru_cache(maxsize=1)
 def _cached_schema_text() -> str:
-    """Schema is static at runtime — fetch once and cache."""
+    """Return the schema as prompt text. The schema doesn't change at runtime, so it is cached."""
     schema_df = get_schema()
     lines = []
     for table in schema_df["table"].unique():
-        cols = schema_df[schema_df["table"] == table]
-        col_list = ", ".join(f"{r.column} ({r.type})" for r in cols.itertuples(index=False))
+        table_cols = schema_df[schema_df["table"] == table]
+        col_list = ", ".join(f"{row.column} ({row.type})" for row in table_cols.itertuples(index=False))
         lines.append(f"- {table}: {col_list}")
     return "\n".join(lines)
 
 
 def _strip_code_fence(sql: str) -> str:
-    """LLMs sometimes wrap output in ```sql ... ```. Strip if present."""
-    s = sql.strip()
-    if s.startswith("```"):
-        s = s.split("\n", 1)[1] if "\n" in s else s
-        if s.endswith("```"):
-            s = s[: -3]
-    return s.strip().lstrip("sql").strip() if s.lower().startswith("sql\n") else s.strip()
+    """Remove a ```sql ... ``` fence if the LLM wrapped its output in one."""
+    text = sql.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else text
+        if text.endswith("```"):
+            text = text[: -3]
+    return text.strip().lstrip("sql").strip() if text.lower().startswith("sql\n") else text.strip()
 
 
 def generate_sql(user_question: str, client: OpenAI | None = None) -> str:
@@ -62,7 +62,7 @@ def generate_sql(user_question: str, client: OpenAI | None = None) -> str:
         "Return ONLY a single SQLite SELECT query:"
     )
 
-    resp = client.chat.completions.create(
+    response = client.chat.completions.create(
         model=MODEL,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -71,7 +71,7 @@ def generate_sql(user_question: str, client: OpenAI | None = None) -> str:
         temperature=0,
     )
 
-    return _strip_code_fence(resp.choices[0].message.content or "")
+    return _strip_code_fence(response.choices[0].message.content or "")
 
 
 def answer_question(user_question: str, client: OpenAI | None = None) -> tuple[str, pd.DataFrame]:

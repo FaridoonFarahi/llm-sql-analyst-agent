@@ -1,52 +1,37 @@
-# LLM SQL Analyst Agent
+# LLM SQL analyst agent
 
-An AI-powered analytics agent that converts natural language questions into safe SQL queries and executes them against a real database.
+An analytics agent that turns natural-language questions into safe SQL queries and runs them against a real database.
 
-This project demonstrates how to build a **tool-using LLM agent** with schema grounding, safety guardrails, and real database execution.
+The project is an example of how to build a tool-using LLM agent with schema grounding, safety guardrails, and execution against a real database.
 
----
+## What it does
 
-## 🔍 What This Agent Does
+1. Takes a question in plain English.
+2. Uses an LLM to generate a SQLite `SELECT` query.
+3. Runs safety checks so only read-only SQL gets through.
+4. Executes the query on a real database.
+5. Returns the results to the user.
 
-1. Takes a question in plain English  
-2. Uses an LLM to generate a SQLite `SELECT` query  
-3. Applies safety checks (read-only SQL only)  
-4. Executes the query on a real database  
-5. Returns results to the user  
+## Dataset
 
-**English → SQL → Execute → Results**
+The agent runs on the Chinook SQLite database. Its tables include customers, invoices, tracks, albums, and artists. It is a realistic business-style schema that people use for SQL training and demos.
 
----
+## What the project covers
 
-## 🗄 Dataset
-
-- **Chinook SQLite Database**
-- Tables include: customers, invoices, tracks, albums, artists
-- Realistic business-style schema used for SQL training and demos
-
----
-
-## 🧠 Why This Project Matters
-
-This project showcases:
-- LLM + tool integration
+- LLM and tool integration
 - Schema-aware SQL generation
 - Safety guardrails for AI systems
-- Real database analytics (not mock data)
-- Enterprise-aware development constraints
+- Analytics on a real database, not mock data
+- Development with enterprise constraints in mind
 
----
-
-## 🛠 Tech Stack
+## Tech stack
 
 - Python
 - SQLite
 - OpenAI API
 - Pandas
 
----
-
-## 📂 Project Structure
+## Project structure
 ```text
 llm-sql-analyst-agent/
 ├── assets/
@@ -66,16 +51,12 @@ llm-sql-analyst-agent/
 └── requirements.txt
 ```
 
----
+## Demo
 
-## ▶️ Demo Screenshots
-
-### Top 10 Countries by Customers
+### Top 10 countries by customers
 ![Top 10 Countries by Customers](assets/demo_customers.png)
 
----
-
-## 🛠 Setup
+## Setup
 
 ```bash
 # 1. Clone and enter the repo
@@ -96,27 +77,17 @@ pip install -r requirements.txt
 cp .env.example .env        # then edit .env and paste your key
 ```
 
-> The `.env` file is gitignored — never commit your API key.
+The `.env` file is gitignored. Never commit your API key.
 
----
-
-## ▶️ How to Run
+## How to run
 ```bash
 python src/agent.py
 ```
 
-You'll be prompted for a natural-language question. The agent prints
-the generated SQL and the top rows of the result.
+The script asks for a natural-language question, then prints the generated SQL and the top rows of the result.
 
----
+## Safety model
 
-## 🛡 Safety model
-
-- **LLM never executes SQL directly.** It only emits a SQL string.
-- That string is parsed by `sqlparse`. The agent **rejects** anything
-  that isn't a single `SELECT` (or `WITH … SELECT`).
-- The SQLite connection is opened in **read-only mode**
-  (`?mode=ro`) so even if the safety check were bypassed,
-  the database file cannot be modified.
-
----
+- The LLM never executes SQL itself. It only returns a SQL string.
+- `sqlparse` parses that string, and the agent rejects anything that isn't a single `SELECT` (or `WITH … SELECT`).
+- The SQLite connection is opened in read-only mode (`?mode=ro`), so even if the safety check were bypassed, the database file cannot be modified.

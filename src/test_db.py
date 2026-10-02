@@ -1,6 +1,6 @@
 from db import run_sql
 
-q = """
+query = """
 SELECT
   c.country,
   COUNT(*) AS num_customers
@@ -10,4 +10,4 @@ ORDER BY num_customers DESC
 LIMIT 10;
 """
 
-print(run_sql(q))
+print(run_sql(query))

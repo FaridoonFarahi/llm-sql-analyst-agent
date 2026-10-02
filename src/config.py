@@ -7,7 +7,6 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_ROOT / "db" / "chinook.db"
 
-# Model
 MODEL = "gpt-4.1-mini"
 
 # Result preview cap (rows printed in CLI). Underlying query still returns full result.
